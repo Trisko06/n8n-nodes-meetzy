@@ -1,0 +1,120 @@
+{
+  "name": "Website form → Meetzy lead + follow-up task",
+  "nodes": [
+    {
+      "id": "note--40--260",
+      "name": "Note -40",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -260
+      ],
+      "parameters": {
+        "content": "## Website form → Meetzy lead\nA form posts to this webhook. The person becomes a lead in Meetzy (no duplicate: same email = same contact) and a follow-up call is planned for tomorrow.\n\n**Setup:** add your Meetzy API key (Meetzy → Integrations & API → API keys), then point your form to the webhook URL.",
+        "height": 220,
+        "width": 340
+      }
+    },
+    {
+      "id": "hook",
+      "name": "Form submitted",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "meetzy-form-example",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meetzy-form",
+        "options": {}
+      }
+    },
+    {
+      "id": "lead",
+      "name": "Create lead",
+      "type": "n8n-nodes-meetzy.meetzy",
+      "typeVersion": 1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "meetzyApi": {
+          "id": "",
+          "name": "Meetzy account"
+        }
+      },
+      "parameters": {
+        "resource": "contact",
+        "operation": "createLead",
+        "email": "={{ $json.body.email }}",
+        "additionalFields": {
+          "first_name": "={{ $json.body.first_name }}",
+          "last_name": "={{ $json.body.last_name }}",
+          "company": "={{ $json.body.company }}",
+          "phone": "={{ $json.body.phone }}",
+          "source": "website_form"
+        }
+      }
+    },
+    {
+      "id": "task",
+      "name": "Plan follow-up call",
+      "type": "n8n-nodes-meetzy.meetzy",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ],
+      "credentials": {
+        "meetzyApi": {
+          "id": "",
+          "name": "Meetzy account"
+        }
+      },
+      "parameters": {
+        "resource": "task",
+        "operation": "createTask",
+        "title": "=Call {{ $json.display_name }} — website form",
+        "additionalFields": {
+          "lead_id": "={{ $json.id }}",
+          "type": "call",
+          "due_at": "={{ $now.plus({ days: 1 }).toISO() }}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Form submitted": {
+      "main": [
+        [
+          {
+            "node": "Create lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create lead": {
+      "main": [
+        [
+          {
+            "node": "Plan follow-up call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

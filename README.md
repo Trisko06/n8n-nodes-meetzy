@@ -168,6 +168,14 @@ Tips:
 - Dates are sent as `YYYY-MM-DD`, date-times as ISO strings — the n8n date picker works for both.
 - API errors keep the message Meetzy returns (missing scope, not enough credits, rate limit…), and *Continue on fail* puts it in the item’s `error` field.
 
+## Example workflows
+
+Ready to import (n8n → Workflows → Import from file), in [`examples/`](examples):
+
+- **Website form → Meetzy lead + follow-up task** — a webhook receives the form, the person becomes a lead (same email = same contact) and a call is planned for tomorrow.
+- **Meetzy deal won → Slack message** — the Meetzy Trigger posts every won deal in your sales channel.
+- **Shopify order → Meetzy contact + deal** — each order finds or creates the customer and records the order as a deal.
+
 ## Resources
 
 - [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)

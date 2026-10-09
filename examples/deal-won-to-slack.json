@@ -1,0 +1,81 @@
+{
+  "name": "Meetzy deal won → Slack message",
+  "nodes": [
+    {
+      "id": "note--40--260",
+      "name": "Note -40",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -260
+      ],
+      "parameters": {
+        "content": "## Deal won → Slack\nEvery deal moved to Won in Meetzy posts a message in your sales channel. The trigger subscribes a signed webhook in Meetzy when the workflow is activated.",
+        "height": 220,
+        "width": 340
+      }
+    },
+    {
+      "id": "trig",
+      "name": "Deal won in Meetzy",
+      "type": "n8n-nodes-meetzy.meetzyTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "meetzy-deal-won-example",
+      "credentials": {
+        "meetzyApi": {
+          "id": "",
+          "name": "Meetzy account"
+        }
+      },
+      "parameters": {
+        "events": [
+          "deal.won"
+        ]
+      }
+    },
+    {
+      "id": "slack",
+      "name": "Post in #sales",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#sales",
+          "mode": "name"
+        },
+        "text": "=:tada: Deal won: *{{ $json.data.name }}* — {{ $json.data.amount }} {{ $json.data.currency }} ({{ $json.data.owner_email }})",
+        "otherOptions": {}
+      }
+    }
+  ],
+  "connections": {
+    "Deal won in Meetzy": {
+      "main": [
+        [
+          {
+            "node": "Post in #sales",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

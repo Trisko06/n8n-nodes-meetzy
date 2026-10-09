@@ -1,0 +1,117 @@
+{
+  "name": "Shopify order → Meetzy contact + won deal",
+  "nodes": [
+    {
+      "id": "note--40--260",
+      "name": "Note -40",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -260
+      ],
+      "parameters": {
+        "content": "## Shopify order → Meetzy\nEach new order finds or creates the customer in Meetzy and records the order as a deal, so sales see what every account buys.",
+        "height": 220,
+        "width": 340
+      }
+    },
+    {
+      "id": "shop",
+      "name": "New Shopify order",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "meetzy-shopify-example",
+      "parameters": {
+        "topic": "orders/create"
+      }
+    },
+    {
+      "id": "lead",
+      "name": "Find or create customer",
+      "type": "n8n-nodes-meetzy.meetzy",
+      "typeVersion": 1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "meetzyApi": {
+          "id": "",
+          "name": "Meetzy account"
+        }
+      },
+      "parameters": {
+        "resource": "contact",
+        "operation": "createLead",
+        "email": "={{ $json.email }}",
+        "additionalFields": {
+          "first_name": "={{ $json.customer.first_name }}",
+          "last_name": "={{ $json.customer.last_name }}",
+          "source": "shopify"
+        }
+      }
+    },
+    {
+      "id": "deal",
+      "name": "Record the order",
+      "type": "n8n-nodes-meetzy.meetzy",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ],
+      "credentials": {
+        "meetzyApi": {
+          "id": "",
+          "name": "Meetzy account"
+        }
+      },
+      "parameters": {
+        "resource": "deal",
+        "operation": "createDeal",
+        "name": "=Shopify order {{ $('New Shopify order').item.json.name }}",
+        "additionalFields": {
+          "amount": "={{ Number($('New Shopify order').item.json.total_price) }}",
+          "currency": "={{ $('New Shopify order').item.json.currency }}",
+          "primary_lead_id": "={{ $json.id }}",
+          "source": "shopify"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "New Shopify order": {
+      "main": [
+        [
+          {
+            "node": "Find or create customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find or create customer": {
+      "main": [
+        [
+          {
+            "node": "Record the order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
