@@ -200,6 +200,7 @@ npm run dev        # runs a local n8n with the node linked (hot reload)
 
 ## Version history
 
+- **0.1.1** — Example workflows in `examples/`; released through npm trusted publishing.
 - **0.1.0** — First release: Meetzy node (60 operations across contacts, companies, deals, tasks, WhatsApp / LinkedIn / email, Prospect Finder, sequences, quotes, ERP analytics, workspace) and Meetzy Trigger (50 event types, signed webhooks).
 
 ## License

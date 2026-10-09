@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-meetzy",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Sales CRM with B2B prospect finder, WhatsApp & LinkedIn messaging, email sequences, ERP sales analytics and AI copilot.",
 	"license": "MIT",
 	"homepage": "https://www.meetzy.ai",
