@@ -2179,6 +2179,12 @@ export const ROUTES: Record<string, Route> = {
 				in: 'body',
 				kind: 'string',
 			},
+			{
+				name: 'message',
+				in: 'body',
+				kind: 'string',
+				collection: 'additionalFields',
+			},
 		],
 		output: 'record',
 	},
@@ -2388,6 +2394,12 @@ export const ROUTES: Record<string, Route> = {
 		kind: 'search',
 		fields: [
 			{
+				name: 'query',
+				in: 'body',
+				kind: 'string',
+				collection: 'filters',
+			},
+			{
 				name: 'mode',
 				in: 'body',
 				kind: 'string',
@@ -2555,6 +2567,18 @@ export const ROUTES: Record<string, Route> = {
 			},
 			{
 				name: 'q',
+				in: 'query',
+				kind: 'string',
+				collection: 'filters',
+			},
+			{
+				name: 'segment',
+				in: 'query',
+				kind: 'string',
+				collection: 'filters',
+			},
+			{
+				name: 'sort',
 				in: 'query',
 				kind: 'string',
 				collection: 'filters',
@@ -3526,7 +3550,8 @@ const messageOperations: INodePropertyOptions[] = [
 	{
 		name: 'Send a LinkedIn Invitation',
 		value: 'linkedinInvite',
-		description: 'Sends a LinkedIn connection request to a contact from your own account',
+		description:
+			'Sends a LinkedIn connection request to a contact from your own account — blank, or with a short note (merge tags like {{contact.first_name}} work)',
 		action: 'Send a LinkedIn invitation',
 	},
 	{
@@ -7328,6 +7353,32 @@ export const PROPERTIES: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Additional Fields',
+		name: 'additionalFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['linkedinInvite'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Message',
+				name: 'message',
+				type: 'string',
+				default: '',
+				typeOptions: {
+					rows: 4,
+				},
+				description:
+					'Optional note, 300 characters max (longer is cut at a word). Merge tags like {{contact.first_name}} are filled in. Free LinkedIn accounts can only send a few notes a month.',
+			},
+		],
+	},
+	{
 		displayName: 'Contact ID',
 		name: 'contact_id',
 		type: 'string',
@@ -7841,6 +7892,14 @@ export const PROPERTIES: INodeProperties[] = [
 					'Job titles (Head of Sales). Similar titles included unless include_similar_titles: false. Comma-separated.',
 			},
 			{
+				displayName: 'Query',
+				name: 'query',
+				type: 'string',
+				default: '',
+				description:
+					'Who to look for, in a sentence in any language (heads of sales at 20-200 people SaaS companies in France) — read the same way as in the app. The answer adds understood (a readable summary) and filters_from_query; the filters below refine it.',
+			},
+			{
 				displayName: 'Revenue Min',
 				name: 'revenue_min',
 				type: 'number',
@@ -7940,19 +7999,9 @@ export const PROPERTIES: INodeProperties[] = [
 			{
 				displayName: 'Identified',
 				name: 'identified',
-				type: 'options',
-				options: [
-					{
-						name: 'False',
-						value: 'false',
-					},
-					{
-						name: 'True',
-						value: 'true',
-					},
-				],
-				default: 'true',
-				description: 'True (default): only visitors with an email; false: everyone',
+				type: 'string',
+				default: '',
+				description: 'Older form of segment: true = identified, false = all',
 			},
 			{
 				displayName: 'Search',
@@ -7960,6 +8009,65 @@ export const PROPERTIES: INodeProperties[] = [
 				type: 'string',
 				default: '',
 				description: 'Search in email, name and company',
+			},
+			{
+				displayName: 'Segment',
+				name: 'segment',
+				type: 'options',
+				options: [
+					{
+						name: 'All',
+						value: 'all',
+					},
+					{
+						name: 'Customers',
+						value: 'customers',
+					},
+					{
+						name: 'Hot',
+						value: 'hot',
+					},
+					{
+						name: 'Identified',
+						value: 'identified',
+					},
+					{
+						name: 'Returning',
+						value: 'returning',
+					},
+				],
+				default: 'identified',
+				description:
+					'Identified (left an email — default), all, returning (came back), hot (score 60 or more) or customers (bought)',
+			},
+			{
+				displayName: 'Sort',
+				name: 'sort',
+				type: 'options',
+				options: [
+					{
+						name: 'Last Seen',
+						value: 'last_seen',
+					},
+					{
+						name: 'Pages',
+						value: 'pages',
+					},
+					{
+						name: 'Score',
+						value: 'score',
+					},
+					{
+						name: 'Time',
+						value: 'time',
+					},
+					{
+						name: 'Visits',
+						value: 'visits',
+					},
+				],
+				default: 'last_seen',
+				description: 'Last_seen (default), score, visits, pages or time',
 			},
 			{
 				displayName: 'Tracking ID',
